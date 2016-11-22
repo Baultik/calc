@@ -1,0 +1,29 @@
+.calculator-body {
+    width:300px;
+}
+
+.display {
+    text-align: right;
+    background-color: #6a6969;
+    box-sizing: border-box;
+    padding: 0 15px;
+}
+
+.row {
+    margin:0;
+}
+
+.button-container{
+    padding:2px;
+}
+
+button {
+    width:100%;
+
+}
+
+div {
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
+}
