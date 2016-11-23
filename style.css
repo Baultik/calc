@@ -1,29 +1,35 @@
-.calculator-body {
-    width:300px;
+div {
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
 }
 
-.display {
-    text-align: right;
-    background-color: #6a6969;
-    box-sizing: border-box;
-    padding: 0 15px;
+.calculator-body {
+    width:300px;
+    background-color: #241500;
+    padding:10px;
+    margin:auto;
 }
 
 .row {
     margin:0;
 }
 
+#display {
+    text-align: right;
+    background-color: #6a6969;
+    box-sizing: border-box;
+    padding: 0 10px;
+    margin: 2px 2px;
+    color:#ffffff;
+    height:20px;
+}
+
 .button-container{
     padding:2px;
 }
 
-button {
+.btn {
     width:100%;
-
 }
 
-div {
-    padding:0;
-    margin:0;
-    box-sizing: border-box;
-}
