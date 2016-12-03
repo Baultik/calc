@@ -1,3 +1,13 @@
+body {
+    background: #ebebeb;
+    background: -moz-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
+    background: -webkit-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
+    background: -o-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
+    background: -ms-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
+    background: linear-gradient(to right, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebebeb', endColorstr='#ebebeb', GradientType=1 );
+}
+
 div {
     padding:0;
     margin:0;
@@ -15,6 +25,7 @@ div {
 }
 
 #display {
+    font-family: 'Lato', sans-serif;
     text-align: right;
     background-color: #6a6969;
     box-sizing: border-box;
