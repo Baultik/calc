@@ -32,22 +32,20 @@ function Calculator() {
     var total = 0;
 
     this.addInput = function (input) {
-        display.updateDisplay(input);
-
         var lastIndex = entryQueue.length - 1;
         var lastEntry = entryQueue[lastIndex];
         if (lastEntry && lastEntry.add(input)) {
-            if (lastEntry.type() === typeEnum.number)setInitial(lastEntry);
-            return;//entry exists and is number - add to it
+            //entry exists and is number - add to it
+            //update with current value - number ie 1.2
+            display.updateDisplay(lastEntry.value());
+            setInitial(lastEntry);
+            return;
         }
 
         var entry = new Entry(input);
         entryQueue.push(entry);
 
         if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign) {
-            //catalyst - update total by performing pending operation
-
-
 
             total = calculate(total,operationStart);
 
@@ -57,8 +55,8 @@ function Calculator() {
             }
 
         } else if (entry.type() === typeEnum.number) {
-            //first item
             setInitial(entry);
+            display.updateDisplay(input);
         } else if (entry.type() === typeEnum.clear) {
             total = 0;
             entryQueue = [];

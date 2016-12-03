@@ -1,11 +1,10 @@
 div {
     padding:0;
     margin:0;
-    box-sizing: border-box;
 }
 
 .calculator-body {
-    width:300px;
+    width:250px;
     background-color: #241500;
     padding:10px;
     margin:auto;
@@ -20,7 +19,7 @@ div {
     background-color: #6a6969;
     box-sizing: border-box;
     padding: 0 10px;
-    margin: 2px 2px;
+    margin: 2px 4px;
     color:#ffffff;
     height:20px;
 }
@@ -31,5 +30,40 @@ div {
 
 .btn {
     width:100%;
+    height:40px;
 }
 
+.btn-normal {
+    width:25%;
+    float:left;
+}
+
+.btn-test {
+    width:25%;
+
+}
+
+.btn-special {
+    float:right;
+}
+
+.btn-wide {
+    width:50%;
+    float:left;
+}
+
+.btn-double {
+    height:84px;
+}
+
+.btn-double:after {
+    clear:both;
+}
+
+.button-container:after {
+    content: "";
+    visibility: hidden;
+    display: block;
+    height: 0;
+    clear: both;
+}
