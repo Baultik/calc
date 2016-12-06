@@ -24,13 +24,13 @@ div {
     margin:0;
 }
 
-#display {
+#display,#calculation {
     font-family: 'Lato', sans-serif;
     text-align: right;
     background-color: #6a6969;
     box-sizing: border-box;
     padding: 0 10px;
-    margin: 2px 4px;
+    margin: 0 4px;
     color:#ffffff;
     height:20px;
 }

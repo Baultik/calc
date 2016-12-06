@@ -37,23 +37,29 @@ function Calculator() {
         if (lastEntry && lastEntry.add(input)) {
             //entry exists and is number - add to it
             //update with current value - number ie 1.2
-            display.updateDisplay(lastEntry.value());
+            if (lastEntry.type() === typeEnum.number ) display.updateDisplay(lastEntry.value());
             setInitial(lastEntry);
+            display.updateCalculation(entryQueue);
             return;
         }
 
         var entry = new Entry(input);
         entryQueue.push(entry);
 
+        display.updateCalculation(entryQueue);
+
         if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign) {
 
-            total = calculate(total,operationStart);
+            //total = calculate(total,operationStart,entryQueue);
+            total = orderOfOpsAttempt(entryQueue);
 
             if (entry.type() === typeEnum.operator) {
                 //update operation index
                 operationStart = lastIndex + 1;
-            }
+            } else {
 
+                display.clearCalculation();
+            }
         } else if (entry.type() === typeEnum.number) {
             setInitial(entry);
             display.updateDisplay(input);
@@ -61,6 +67,7 @@ function Calculator() {
             total = 0;
             entryQueue = [];
             display.updateDisplay(total);
+            display.clearCalculation();
         }
     };
 
@@ -71,19 +78,19 @@ function Calculator() {
         }
     }
 
-    function calculate(currentTotal,operatorIndex) {
-        var operatorEntry = entryQueue[operatorIndex];
-        var numberEntry = entryQueue[operatorIndex+1];
+    function calculate(currentTotal,operatorIndex,queue) {
+        var operatorEntry = queue[operatorIndex];
+        var numberEntry = queue[operatorIndex+1];
 
         if (operatorEntry && numberEntry) {
             var parsedValue = parseFloat(numberEntry.value());
 
             if (numberEntry.type() === typeEnum.equalSign) {
-                if (operatorIndex + 1 == entryQueue.length - 1) {
+                //if (operatorIndex + 1 == queue.length - 1) {
                     parsedValue = currentTotal;
-                } else {
-                    return currentTotal;
-                }
+                // } else {
+                //     return currentTotal;
+                // }
             }
 
             switch (operatorEntry.value()) {
@@ -107,6 +114,86 @@ function Calculator() {
             display.updateDisplay(currentTotal);
         }
         return currentTotal;
+    }
+
+    function equalsCount(queue){
+        var equals = 0;
+        for (var i = 0; i < queue.length; i++) {
+            var entry = queue[i];
+            if (entry.type() === typeEnum.equalSign) {
+                equals++;
+            }
+        }
+        return equals;
+    }
+
+    function orderOfOpsAttempt(entryQueue) {
+        var operations = entryQueue.slice();
+        var total = 0;
+        var operatorEntry = null;
+        var numberEntry = null;
+
+        while (operations.length > 0) {
+            var highest = findHighest(operations);
+            if (highest === null) {
+                var equal = operations[operations.length - 1];
+                if (equal && equal.type() === typeEnum.equalSign && equalsCount(operations) > 1) {
+                    operations.splice(1,1,operatorEntry,numberEntry);
+                    highest = findHighest(operations);
+                    if (highest === null) break;
+                } else {
+                    break;
+                }
+            }
+
+            var left = operations[highest.index-1];
+            operatorEntry = operations[highest.index];
+            numberEntry = operations[highest.index+1];
+            if (!operatorEntry || !numberEntry) break;
+
+            var current = 0;
+            var startSplice = highest.index;
+            var spliceCount = 2;
+            if (left && left.type() === typeEnum.number) {
+                current = left.value();
+                startSplice = highest.index-1;
+                spliceCount = 3;
+            }
+
+            total = calculate(parseFloat(current),highest.index,operations);
+
+            operations.splice(startSplice,spliceCount,new Entry(total));
+        }
+
+        return total;
+    }
+
+    this.tryIt = function() {
+        var queue = [new Entry(1),new Entry("+"),new Entry(3),new Entry("÷"),new Entry(4),new Entry("+"),new Entry(10),new Entry("×"),new Entry(2)];
+        return orderOfOpsAttempt(queue);
+    };
+
+    function findHighest(entryQueue) {
+        var highest = null;
+        //get order of operations
+        for (var i = 0; i < entryQueue.length; i++) {
+            var entry = entryQueue[i];
+            var precedence = 1;
+            if (entry && entry.type() === typeEnum.operator) {
+                if (entry.value() ===  "÷" || entry.value() ===  "×") {
+                    precedence = entryQueue.length * 10;
+                }
+                var val = (entryQueue.length - i ) * precedence;
+                if (highest === null)highest = {index:0,value:0};
+                if (val > highest.value) {
+                    highest.index = i;
+                    highest.value = val;
+                    //console.log("Entry:" + entry.type() + " " + entry.value());
+                }
+            }
+        }
+        //console.log("returning...");
+        return highest;
     }
 }
 
@@ -171,12 +258,21 @@ function Entry(value) {
 
 function Display() {
     var display = $("#display");
+    var calculation = $("#calculation");
 
     this.updateDisplay = function (toDisplay) {
         display.html(toDisplay);
     };
 
-    this.clearDisplay = function () {
-        display.html(" ");
+    this.updateCalculation = function (arrayToDisplay) {
+        var toDisplay = "";
+        for (var i in arrayToDisplay) {
+            toDisplay += arrayToDisplay[i].value();
+        }
+        calculation.html(toDisplay);
+    };
+
+    this.clearCalculation = function () {
+        calculation.html(" ");
     };
 }
