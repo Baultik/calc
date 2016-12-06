@@ -94,12 +94,12 @@ function Calculator() {
         if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign) {
             //mTotal = calculate(mTotal,mOperationStart,mEntryQueue);
             mTotal = orderOfOps(mEntryQueue);
-
+/*
             if (entry.type() === typeEnum.operator) {
                 mOperationStart = lastIndex + 1;
             } else {
                 mDisplay.clearCalculation();
-            }
+            }*/
         } else if (entry.type() === typeEnum.number) {
             setInitial(entry);
             //mTotal = orderOfOps(mEntryQueue);
@@ -162,7 +162,7 @@ function Calculator() {
                     currentTotal -= parsedValue;
                     break;
             }
-            //mDisplay.updateDisplay(currentTotal);
+            mDisplay.updateDisplay(currentTotal);
         }
         return currentTotal;
     }
@@ -226,7 +226,7 @@ function Calculator() {
 
             total = calculate(parseFloat(current),highest.index,operations);
             if (operatorEntry && numberEntry) {
-                mDisplay.updateDisplay(total);
+                //mDisplay.updateDisplay(total);
                 operations.splice(startSplice, spliceCount, new Entry(total));
             }
         }
