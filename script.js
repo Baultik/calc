@@ -1,8 +1,7 @@
 /**
  * Created by baultik on 11/22/16.
  */
-var calc = new Calculator();
-var display = null;
+var calc = null;
 var typeEnum = {
     number: "number",
     operator: "operator",
@@ -11,11 +10,10 @@ var typeEnum = {
 };
 
 $(document).ready(function () {
+    calc = new Calculator();
     $(".btn").on("click", handleClick);
     $(document).on("keypress", handleKeyPress);
     $(document).on("keydown", handleSpecialKeys);
-    display = new Display();
-
 });
 /**
  * Button click handler
@@ -33,9 +31,9 @@ function handleClick(event) {
  */
 function handleSpecialKeys(event) {
     if (event.which == 46) {
-        //delete key - doesn't trigger keypress
+        //delete key - doesn't trigger keypress but does keydown
         //console.log("Delete " + event.charCode + " " + event.which);
-        calc.addInput("C");//C means clear
+        calc.addInput("C");//C to clear
     }
 }
 /**
@@ -69,7 +67,7 @@ function Calculator() {
     var mEntryQueue = [];
     var mOperationStart = 1;
     var mTotal = 0;
-
+    var mDisplay = new Display();
     /**
      * Accepts and handles user input
      * @param input The user input {@link Entry} object
@@ -80,10 +78,10 @@ function Calculator() {
         var lastEntry = mEntryQueue[lastIndex];
         if (lastEntry && lastEntry.add(input)) {
             //entry exists and is number -> add to it - or is operator -> replace it
-            //update display with current value - ie 1.2
-            if (lastEntry.type() === typeEnum.number ) display.updateDisplay(lastEntry.value());
+            //update mDisplay with current value - ie 1.2
+            if (lastEntry.type() === typeEnum.number ) mDisplay.updateDisplay(lastEntry.value());
             setInitial(lastEntry);
-            display.updateCalculation(mEntryQueue);
+            mDisplay.updateCalculation(mEntryQueue);
             return;
         }
 
@@ -91,7 +89,7 @@ function Calculator() {
         var entry = new Entry(input);
         mEntryQueue.push(entry);
 
-        display.updateCalculation(mEntryQueue);
+        mDisplay.updateCalculation(mEntryQueue);
 
         if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign) {
             //mTotal = calculate(mTotal,mOperationStart,mEntryQueue);
@@ -100,17 +98,17 @@ function Calculator() {
             if (entry.type() === typeEnum.operator) {
                 mOperationStart = lastIndex + 1;
             } else {
-                display.clearCalculation();
+                mDisplay.clearCalculation();
             }
         } else if (entry.type() === typeEnum.number) {
             setInitial(entry);
             //mTotal = orderOfOps(mEntryQueue);
-            display.updateDisplay(input);
+            mDisplay.updateDisplay(input);
         } else if (entry.type() === typeEnum.clear) {
             mTotal = 0;
             mEntryQueue = [];
-            display.updateDisplay(mTotal);
-            display.clearCalculation();
+            mDisplay.updateDisplay(mTotal);
+            mDisplay.clearCalculation();
         }
     };
     /**
@@ -149,7 +147,7 @@ function Calculator() {
             switch (operatorEntry.value()) {
                 case "÷":
                     if (parsedValue == 0){
-                        display.updateDisplay("Error");
+                        mDisplay.updateDisplay("Error");
                         return currentTotal;
                     }
                     currentTotal /= parsedValue;
@@ -164,7 +162,7 @@ function Calculator() {
                     currentTotal -= parsedValue;
                     break;
             }
-            display.updateDisplay(currentTotal);
+            //mDisplay.updateDisplay(currentTotal);
         }
         return currentTotal;
     }
@@ -227,13 +225,13 @@ function Calculator() {
             }
 
             total = calculate(parseFloat(current),highest.index,operations);
-            //if (!operatorEntry || !numberEntry) break;
             if (operatorEntry && numberEntry) {
+                mDisplay.updateDisplay(total);
                 operations.splice(startSplice, spliceCount, new Entry(total));
             }
         }
         //console.log("calculation done");
-        //display.updateDisplay(total);
+        //mDisplay.updateDisplay(total);
         return total;
     }
 
@@ -310,7 +308,6 @@ function Entry(value) {
                     mValue = mValue.slice(0, mValue.length - 1);
                 }
                 mValue += value;
-                //display.updateDisplay(mValue);
                 return true;
             case typeEnum.operator:
                 mValue = value;
