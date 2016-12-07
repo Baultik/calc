@@ -170,14 +170,14 @@ function Calculator() {
     /**
      * Total the numbers of '=' in the queue. More than one
      * @param queue The current queue of {@link Entry} objects
-     * @returns {number}
+     * @returns {Array} An array of the indices where '=' appears
      */
     function equalsCount(queue){
-        var equals = 0;
+        var equals = [];
         for (var i = 0; i < queue.length; i++) {
             var entry = queue[i];
             if (entry.type() === typeEnum.equalSign) {
-                equals++;
+                equals.push(i);
             }
         }
         return equals;
@@ -200,8 +200,9 @@ function Calculator() {
             if (highest === null) {
                 //Handle extra = in multiple = entry
                 var equal = operations[operations.length - 1];
-                if (equal && equal.type() === typeEnum.equalSign && equalsCount(operations) > 1) {
-                    operations.splice(1,1,operatorEntry,numberEntry);
+                var equalsIndices = equalsCount(operations);
+                if (equal && equal.type() === typeEnum.equalSign && equalsIndices.length > 1) {
+                    operations.splice(equalsIndices[0],1,operatorEntry,numberEntry);
                     highest = findHighestOperator(operations);
                     if (highest === null) break;
                 } else {
