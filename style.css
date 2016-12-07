@@ -1,13 +1,6 @@
 body {
-    background: #ebebeb;
-    background: -moz-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
-    background: -webkit-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
-    background: -o-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
-    background: -ms-linear-gradient(left, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
-    background: linear-gradient(to right, #ebebeb 0%, #ffffff 50%, #ebebeb 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebebeb', endColorstr='#ebebeb', GradientType=1 );
+    background-color: #a7a7a7;
 }
-
 div {
     padding:0;
     margin:0;
@@ -15,7 +8,7 @@ div {
 
 .calculator-body {
     width:250px;
-    background-color: #241500;
+    background-color: #484848;
     padding:10px;
     margin:auto;
 }
@@ -26,13 +19,20 @@ div {
 
 #display,#calculation {
     font-family: 'Lato', sans-serif;
+    font-size:1.4em;
     text-align: right;
     background-color: #6a6969;
-    box-sizing: border-box;
     padding: 0 10px;
     margin: 0 4px;
     color:#ffffff;
-    height:20px;
+    height:2em;
+    line-height: 2em;
+    border-radius: 4px;
+    box-shadow: inset 0px 0px 2px 2px rgba(0,0,0,0.5);
+}
+
+#calculation {
+    display:none;
 }
 
 .button-container{
@@ -41,7 +41,18 @@ div {
 
 .btn {
     width:100%;
-    height:40px;
+    height:50px;
+    border:0;
+}
+
+.btn-operator {
+    color :#ffffff;
+    background-color: #9b9a9a;
+}
+
+.btn-operator:hover {
+    color :#ffffff;
+    background-color: #828181;
 }
 
 .btn-normal {
@@ -49,12 +60,7 @@ div {
     float:left;
 }
 
-.btn-test {
-    width:25%;
-
-}
-
-.btn-special {
+.btn-tall {
     float:right;
 }
 
@@ -63,12 +69,8 @@ div {
     float:left;
 }
 
-.btn-double {
-    height:84px;
-}
-
-.btn-double:after {
-    clear:both;
+.btn-tall > .btn {
+    height:104px;
 }
 
 .button-container:after {

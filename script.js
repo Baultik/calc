@@ -94,6 +94,7 @@ function Calculator() {
         if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign) {
             //mTotal = calculate(mTotal,mOperationStart,mEntryQueue);
             mTotal = orderOfOps(mEntryQueue);
+            var a = 0;
 /*
             if (entry.type() === typeEnum.operator) {
                 mOperationStart = lastIndex + 1;
@@ -120,6 +121,24 @@ function Calculator() {
             //first item
             mTotal = parseFloat(entry.value());
         }
+    }
+
+    function precision(number) {
+        var result = number;
+        var numStr = number.toString();
+        var period = numStr.indexOf(".");
+        var count = period;
+        if (period >= 0) {
+            for (var i = period + 1; i < numStr.length; i++) {
+                var char = numStr[i];
+                if (char !== "0") {
+                    count++;
+                }
+            }
+            result = parseFloat(numStr).toPrecision(count);
+        }
+
+        return parseFloat(result);
     }
 
     /**
@@ -162,11 +181,11 @@ function Calculator() {
                     currentTotal -= parsedValue;
                     break;
             }
+            currentTotal = precision(currentTotal);
             mDisplay.updateDisplay(currentTotal);
         }
         return currentTotal;
     }
-
     /**
      * Total the numbers of '=' in the queue. More than one
      * @param queue The current queue of {@link Entry} objects
@@ -243,15 +262,15 @@ function Calculator() {
             if (equals && equals.type() === typeEnum.equalSign) {
                 spliceCount++;
             }
-            printQueue(operations);
+            //printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
             if (operatorEntry && numberEntry) {
                 //mDisplay.updateDisplay(total);
                 operations.splice(startSplice, spliceCount, new Entry(total));
-                printQueue(operations);
+                //printQueue(operations);
             }
         }
-        console.log("calculation done");
+        //console.log("calculation done");
         //mDisplay.updateDisplay(total);
         return total;
     }
