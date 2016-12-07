@@ -46,7 +46,7 @@ function handleKeyPress(event) {
     var pattern = /[0-9./*\-+\r=]/;
 
     if (keyAsChar.match(pattern) !== null) {
-        console.log("Found Match " + keyAsChar + " " + event.which);
+        //console.log("Found Match " + keyAsChar + " " + event.which);
         if (keyAsChar === "*") {
             keyAsChar = "×";
         } else if (keyAsChar === "/") {
