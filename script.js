@@ -305,8 +305,9 @@ function Entry(value) {
 
         switch (this.type()) {
             case typeEnum.number:
-                if (mValue.endsWith(".") && value === ".") {
-                    mValue = mValue.slice(0, mValue.length - 1);
+                if (mValue.includes(".") && value === ".") {
+                    //mValue = mValue.slice(0, mValue.length - 1);
+                    return true;
                 }
                 mValue += value;
                 return true;
