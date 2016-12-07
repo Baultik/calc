@@ -183,6 +183,14 @@ function Calculator() {
         return equals;
     }
 
+    function printQueue(queue) {
+        var message = "Queue :";
+        for (var i = 0; i < queue.length; i++) {
+            message += queue[i].value() + " ";
+        }
+        console.log(message);
+    }
+
     /**
      * Order of operators calculation. Finds the operators and performs the operations
      * @param queue The queue of {@link Entry} objects
@@ -199,10 +207,17 @@ function Calculator() {
             var highest = findHighestOperator(operations);
             if (highest === null) {
                 //Handle extra = in multiple = entry
-                var equal = operations[operations.length - 1];
+                //var equal = operations[operations.length - 1];
                 var equalsIndices = equalsCount(operations);
-                if (equal && equal.type() === typeEnum.equalSign && equalsIndices.length > 1) {
-                    operations.splice(equalsIndices[0],1,operatorEntry,numberEntry);
+                if (equalsIndices.length > 0) {
+                    for (var i = 0; i < operations.length; i++) {
+                        var entry = operations[i];
+                        if (entry && entry.type() === typeEnum.equalSign && numberEntry && numberEntry.type() !== typeEnum.equalSign) {
+                            operations.splice(i,1,operatorEntry,numberEntry);
+                            i = -1;
+                        }
+                    }
+
                     highest = findHighestOperator(operations);
                     if (highest === null) break;
                 } else {
@@ -214,6 +229,7 @@ function Calculator() {
             var left = operations[highest.index-1];
             operatorEntry = operations[highest.index];
             numberEntry = operations[highest.index+1];
+            var equals = operations[highest.index+2];
 
             //If an initial/left value exists - use it and splice it out - else use operator and number
             var current = 0;
@@ -222,16 +238,20 @@ function Calculator() {
             if (left && left.type() === typeEnum.number) {
                 current = left.value();
                 startSplice = highest.index-1;
-                spliceCount = 3;
+                spliceCount++;
             }
-
+            if (equals && equals.type() === typeEnum.equalSign) {
+                spliceCount++;
+            }
+            printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
             if (operatorEntry && numberEntry) {
                 //mDisplay.updateDisplay(total);
                 operations.splice(startSplice, spliceCount, new Entry(total));
+                printQueue(operations);
             }
         }
-        //console.log("calculation done");
+        console.log("calculation done");
         //mDisplay.updateDisplay(total);
         return total;
     }
