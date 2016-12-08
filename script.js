@@ -11,9 +11,10 @@ var typeEnum = {
 
 $(document).ready(function () {
     calc = new Calculator();
+    var doc = $(document);
     $(".btn").on("click", handleClick);
-    $(document).on("keypress", handleKeyPress);
-    $(document).on("keydown", handleSpecialKeys);
+    doc.on("keypress", handleKeyPress);
+    doc.on("keydown", handleSpecialKeys);
 });
 /**
  * Button click handler
