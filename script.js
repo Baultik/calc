@@ -6,7 +6,9 @@ var typeEnum = {
     number: "number",
     operator: "operator",
     equalSign: "equalSign",
-    clear: "clear"
+    clear: "clear",
+    special:"special",
+    sci:"sci"
 };
 
 $(document).ready(function () {
@@ -15,6 +17,19 @@ $(document).ready(function () {
     $(".btn").on("click", handleClick);
     doc.on("keypress", handleKeyPress);
     doc.on("keydown", handleSpecialKeys);
+
+    var calcBody = $(".calculator-body");
+    var mainGrid = $("#grid-main");
+    var sciGrid = $("#grid-sci");
+
+    //var window = $(window);
+    if (doc.width() > doc.height()) {
+        //scientific
+        calcBody.addClass("calculator-body-sci");
+        mainGrid.addClass("grid-right");
+    } else {
+        sciGrid.hide();
+    }
 });
 /**
  * Button click handler
@@ -23,6 +38,12 @@ $(document).ready(function () {
 function handleClick(event) {
     var button = $(this);
     button.blur(); //remove focus
+
+    if (button[0] === calc.getRadDegButton()[0]) {
+        calc.switchRadDeg();
+        return;
+    }
+
     var val = button.text();
     calc.addInput(val);
 }
@@ -69,6 +90,19 @@ function Calculator() {
     var mOperationStart = 1;
     var mTotal = 0;
     var mDisplay = new Display();
+    var mIsRadians = true;
+    var mRadDegButton = $("#radDeg");
+    this.getRadDegButton = function () {
+        return mRadDegButton;
+    };
+    this.switchRadDeg = function () {
+        mIsRadians = !mIsRadians;
+        if (mIsRadians) {
+            mRadDegButton.text("Rad");
+        } else {
+            mRadDegButton.text("Deg");
+        }
+    };
     /**
      * Accepts and handles user input
      * @param input The user input {@link Entry} object
@@ -92,7 +126,7 @@ function Calculator() {
 
         mDisplay.updateCalculation(mEntryQueue);
 
-        if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign) {
+        if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign || entry.type() === typeEnum.sci) {
             //mTotal = calculate(mTotal,mOperationStart,mEntryQueue);
             mTotal = orderOfOps(mEntryQueue);
             var a = 0;
@@ -153,7 +187,8 @@ function Calculator() {
         var operatorEntry = queue[operatorIndex];
         var numberEntry = queue[operatorIndex+1];
 
-        if (operatorEntry && numberEntry) {
+        if (operatorEntry && operatorEntry.type() !== typeEnum.sci &&
+            numberEntry /*&& (numberEntry.type() === typeEnum.number || numberEntry.type() === typeEnum.equalSign)*/) {
             var parsedValue = parseFloat(numberEntry.value());
 
             if (numberEntry.type() === typeEnum.equalSign) {
@@ -180,6 +215,49 @@ function Calculator() {
                     break;
                 case "-":
                     currentTotal -= parsedValue;
+                    break;
+                case "xy":
+                    currentTotal = Math.pow(currentTotal,parsedValue);
+                    break;
+            }
+            currentTotal = precision(currentTotal);
+            mDisplay.updateDisplay(currentTotal);
+        } else if (operatorEntry) {
+            switch (operatorEntry.value()) {
+                case "sin":
+                    if (!mIsRadians) currentTotal *= Math.PI/180;
+                    currentTotal = Math.sin(currentTotal);
+                    break;
+                case "cos":
+                    if (!mIsRadians) currentTotal *= Math.PI/180;
+                    currentTotal = Math.cos(currentTotal);
+                    break;
+                case "tan":
+                    if (!mIsRadians) currentTotal *= Math.PI/180;
+                    currentTotal = Math.tan(currentTotal);
+                    break;
+                case "√":
+                    currentTotal = Math.sqrt(currentTotal);
+                    break;
+                case "ln":
+                    currentTotal = Math.log(currentTotal);
+                    break;
+                case "log":
+                    currentTotal = Math.log(currentTotal) / Math.LN10
+                    break;
+                case "1/x":
+                    if (currentTotal == 0){
+                        mDisplay.updateDisplay("Error");
+                        return currentTotal;
+                    }
+                    currentTotal = 1 / currentTotal;
+                    break;
+                case "!":
+                    var fact = 1;
+                    for (var i = 2; i <= currentTotal; i++) {
+                        fact *= i;
+                    }
+                    currentTotal = fact;
                     break;
             }
             currentTotal = precision(currentTotal);
@@ -254,26 +332,52 @@ function Calculator() {
             //If an initial/left value exists - use it and splice it out - else use operator and number
             var current = 0;
             var startSplice = highest.index;
-            var spliceCount = 2;
+            var spliceCount = 1;
             if (left && left.type() === typeEnum.number) {
                 current = left.value();
                 startSplice = highest.index-1;
                 spliceCount++;
             }
+
+            if (numberEntry && (numberEntry.type() === typeEnum.number || numberEntry.type() === typeEnum.equalSign)) {
+                spliceCount++;
+            }
+
             if (equals && equals.type() === typeEnum.equalSign) {
                 spliceCount++;
             }
-            //printQueue(operations);
+            printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
-            if (operatorEntry && numberEntry) {
+            if (operatorEntry && checkOperator(operatorEntry,numberEntry)) {
                 //mDisplay.updateDisplay(total);
                 operations.splice(startSplice, spliceCount, new Entry(total));
-                //printQueue(operations);
+                printQueue(operations);
             }
         }
         //console.log("calculation done");
         //mDisplay.updateDisplay(total);
         return total;
+    }
+
+    function checkOperator(entry,numberEntry) {
+        if (numberEntry) {
+            return true;
+        }
+        else {
+            switch (entry.value()) {
+                case "sin":
+                case "cos":
+                case "tan":
+                case "√":
+                case "ln":
+                case "log":
+                case "1/x":
+                case "!":
+                    return true;
+            }
+        }
+
+        return false
     }
 
     /**
@@ -287,9 +391,9 @@ function Calculator() {
         for (var i = 0; i < queue.length; i++) {
             var entry = queue[i];
             var precedence = 1;
-            if (entry && entry.type() === typeEnum.operator) {
+            if (entry && (entry.type() === typeEnum.operator || entry.type() === typeEnum.sci)) {
                 var numberEntry = queue[i+1];
-                if (!numberEntry) continue;
+                if (!checkOperator(entry,numberEntry)) continue;
 
                 //Only find operators - times and divide have higher precedence - use number not a possible index
                 if (entry.value() ===  "÷" || entry.value() ===  "×") {
@@ -374,7 +478,22 @@ function Entry(value) {
             case "×":
             case "+":
             case "-":
+            case "xy":
                 type = typeEnum.operator;
+                break;
+            case "sin":
+            case "cos":
+            case "tan":
+            case "√":
+            case "ln":
+            case "log":
+            case "1/x":
+            case "!":
+                type = typeEnum.sci;
+                break;
+            case "Rad":
+            case "Deg":
+                type = typeEnum.special;
                 break;
             case "=":
                 type = typeEnum.equalSign;
