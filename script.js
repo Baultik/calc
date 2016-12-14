@@ -386,30 +386,25 @@ function Calculator() {
      * @returns {*}
      */
     function findHighestOperator(queue) {
-        var highest = null;
-        //get order of operations
-        for (var i = 0; i < queue.length; i++) {
-            var entry = queue[i];
-            var precedence = 1;
-            if (entry && (entry.type() === typeEnum.operator || entry.type() === typeEnum.sci)) {
-                var numberEntry = queue[i+1];
-                if (!checkOperator(entry,numberEntry)) continue;
+        // LFZ Start
 
-                //Only find operators - times and divide have higher precedence - use number not a possible index
-                if (entry.value() ===  "÷" || entry.value() ===  "×") {
-                    precedence = queue.length * 10;
-                }
-                var val = (queue.length - i ) * precedence;
-                if (highest === null)highest = {index:0,value:0};
-                if (val > highest.value) {
-                    highest.index = i;
-                    highest.value = val;
-                    //console.log("Entry:" + entry.type() + " " + entry.value());
-                }
-            }
-        }
-        //console.log("returning...");
-        return highest;
+        //get order of operations
+        //Precedence of operator - defaults to 1 since multiplying by index
+            //Entry exists and is operator or scientific operator
+
+                //entry after operator
+                //Checks if the operator can do a valid operator
+
+
+                //Only find operators - times and divide have higher precedence - use length so it's not a possible index
+
+                //Create actual precedence value
+
+                //if no highest create an empty one
+
+                //Compare precedence value and keep the highest
+
+        // LFZ End
     }
 }
 /**
@@ -510,30 +505,26 @@ function Entry(value) {
  * @constructor
  */
 function Display() {
-    var display = $("#display");
-    var calculation = $("#calculation");
+    // LFZ Start
+    //Main display
+    //Running calculation display
     /**
      * Update the main display with a value
      * @param toDisplay The value to display
      */
-    this.updateDisplay = function (toDisplay) {
-        display.html(toDisplay);
-    };
+
     /**
      * Update the calculation read out from the queue
      * @param queueToDisplay The queue of {@link Entry} objects
      */
-    this.updateCalculation = function (queueToDisplay) {
-        var toDisplay = "";
-        for (var i in queueToDisplay) {
-            toDisplay += queueToDisplay[i].value();
-        }
-        calculation.html(toDisplay);
-    };
+
+
+        //Build string to display from value of the entries in the entry queue
+
+
     /**
      * Clear the calculation read out
      */
-    this.clearCalculation = function () {
-        calculation.html(" ");
-    };
+
+    // LFZ End
 }
