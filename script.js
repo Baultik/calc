@@ -348,23 +348,30 @@ function Calculator() {
             }
             printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
-            if (operatorEntry && checkOperator(operatorEntry,numberEntry)) {
+            if (operatorEntry && checkOperation(operatorEntry,numberEntry)) {
                 //mDisplay.updateDisplay(total);
                 operations.splice(startSplice, spliceCount, new Entry(total));
                 printQueue(operations);
             }
         }
-        //console.log("calculation done");
+        console.log("calculation done");
         //mDisplay.updateDisplay(total);
         return total;
     }
 
-    function checkOperator(entry,numberEntry) {
+    /**
+     * Checks to see if the operator is scientific or not. If it is it must be one of the specified types
+     * that require no right operand. If it is an operator it requires a right operand.
+     * @param operatorEntry Operator in operation
+     * @param numberEntry Right operand in operation
+     * @returns {boolean} Whether an operation can be performed or not
+     */
+    function checkOperation(operatorEntry,numberEntry) {
         if (numberEntry) {
             return true;
         }
         else {
-            switch (entry.value()) {
+            switch (operatorEntry.value()) {
                 case "sin":
                 case "cos":
                 case "tan":
@@ -386,29 +393,46 @@ function Calculator() {
      * @returns {*}
      */
     function findHighestOperator(queue) {
-        var highest = null;
-        //get order of operations
+        //Locate all operators or sci - store operator indexes
+        var operators = [];
         for (var i = 0; i < queue.length; i++) {
             var entry = queue[i];
-            var precedence = 1;
             if (entry && (entry.type() === typeEnum.operator || entry.type() === typeEnum.sci)) {
-                var numberEntry = queue[i+1];
-                if (!checkOperator(entry,numberEntry)) continue;
-
-                //Only find operators - times and divide have higher precedence - use number not a possible index
-                if (entry.value() ===  "÷" || entry.value() ===  "×") {
-                    precedence = queue.length * 10;
+                //If operators exist before a sci operator evaluate those first
+                if (entry.type() === typeEnum.sci && operators.length > 0) {
+                    return findHighestOperator(queue.slice(0,i));
                 }
-                var val = (queue.length - i ) * precedence;
-                if (highest === null)highest = {index:0,value:0};
-                if (val > highest.value) {
-                    highest.index = i;
-                    highest.value = val;
-                    //console.log("Entry:" + entry.type() + " " + entry.value());
-                }
+                operators.push(i);
             }
         }
-        //console.log("returning...");
+
+        var highest = null;
+
+        //Run through all operators - find highest by precedence
+        for (var j = 0; j < operators.length; j++) {
+            //Get operator and right operand
+            var opIndex = operators[j];
+            var operator = queue[opIndex];
+            var numberEntry = queue[opIndex+1];
+            //Check operation
+            if (!checkOperation(operator,numberEntry)) continue;
+
+            var precedence = 1;
+
+            //Only find operators - times and divide have higher precedence - use number that is > possible index
+            if (entry.value() ===  "÷" || entry.value() ===  "×") {
+                precedence = queue.length * 2;
+            }
+
+            var val = (queue.length - opIndex) * precedence;//Earlier indexes have higher precedence
+            if (highest === null)highest = {index:0,value:0};
+            if (val > highest.value) {
+                highest.index = opIndex;
+                highest.value = val;
+                //console.log("Entry:" + entry.type() + " - " + entry.value());
+            }
+        }
+        //console.log("returning...",highest);
         return highest;
     }
 }
