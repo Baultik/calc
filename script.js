@@ -91,6 +91,7 @@ function Calculator() {
     var mDisplay = new Display();
     var mIsRadians = true;
     var mRadDegButton = $("#radDeg");
+    var kError = "Error";
 
     this.total = function() { return mTotal };
 
@@ -191,8 +192,8 @@ function Calculator() {
             switch (operatorEntry.value()) {
                 case "÷":
                     if (parsedValue == 0){
-                        mDisplay.updateDisplay("Error");
-                        return currentTotal;
+                        //mDisplay.updateDisplay("Error");
+                        return kError;//no calculation done
                     }
                     currentTotal /= parsedValue;
                     break;
@@ -236,8 +237,8 @@ function Calculator() {
                     break;
                 case "1/x":
                     if (currentTotal == 0){
-                        mDisplay.updateDisplay("Error");
-                        return currentTotal;
+                        //mDisplay.updateDisplay("Error");
+                        return kError;
                     }
                     currentTotal = 1 / currentTotal;
                     break;
@@ -339,6 +340,7 @@ function Calculator() {
 
             //printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
+            if (total === kError) break;
             // if (operatorEntry && checkOperation(operatorEntry,numberEntry)) {
             operations.splice(startSplice, spliceCount, new Entry(total));
             //printQueue(operations);
