@@ -39,7 +39,7 @@ function handleClick(event) {
     var button = $(this);
     button.blur(); //remove focus
 
-    if (button[0] === calc.getRadDegButton()[0]) {
+    if (button.attr("id") === "radDeg") {
         calc.switchRadDeg();
         return;
     }
@@ -87,14 +87,13 @@ function handleKeyPress(event) {
  */
 function Calculator() {
     var mEntryQueue = [];
-    var mOperationStart = 1;
     var mTotal = 0;
     var mDisplay = new Display();
     var mIsRadians = true;
     var mRadDegButton = $("#radDeg");
-    this.getRadDegButton = function () {
-        return mRadDegButton;
-    };
+
+    this.total = function() { return mTotal };
+
     this.switchRadDeg = function () {
         mIsRadians = !mIsRadians;
         if (mIsRadians) {
@@ -127,18 +126,13 @@ function Calculator() {
         mDisplay.updateCalculation(mEntryQueue);
 
         if (entry.type() === typeEnum.operator || entry.type() === typeEnum.equalSign || entry.type() === typeEnum.sci) {
-            //mTotal = calculate(mTotal,mOperationStart,mEntryQueue);
-            mTotal = orderOfOps(mEntryQueue);
-            var a = 0;
-/*
-            if (entry.type() === typeEnum.operator) {
-                mOperationStart = lastIndex + 1;
-            } else {
-                mDisplay.clearCalculation();
-            }*/
+            var total = orderOfOps(mEntryQueue);
+            if (total !== null) {
+                mTotal = total;
+                mDisplay.updateDisplay(mTotal);
+            }
         } else if (entry.type() === typeEnum.number) {
             setInitial(entry);
-            //mTotal = orderOfOps(mEntryQueue);
             mDisplay.updateDisplay(input);
         } else if (entry.type() === typeEnum.clear) {
             mTotal = 0;
@@ -181,22 +175,17 @@ function Calculator() {
      * @param currentTotal The total to add to or the left operand
      * @param operatorIndex The index of the operator in the queue
      * @param queue The queue with the operator and right operand
-     * @returns {*} The number calculated
+     * @returns {number} The number calculated
      */
     function calculate(currentTotal,operatorIndex,queue) {
         var operatorEntry = queue[operatorIndex];
         var numberEntry = queue[operatorIndex+1];
 
-        if (operatorEntry && operatorEntry.type() !== typeEnum.sci &&
-            numberEntry /*&& (numberEntry.type() === typeEnum.number || numberEntry.type() === typeEnum.equalSign)*/) {
+        if (operatorEntry && operatorEntry.type() !== typeEnum.sci && numberEntry) {
             var parsedValue = parseFloat(numberEntry.value());
 
             if (numberEntry.type() === typeEnum.equalSign) {
-                //if (operatorIndex + 1 == queue.length - 1) {
-                    parsedValue = currentTotal;
-                // } else {
-                //     return currentTotal;
-                // }
+                parsedValue = currentTotal;
             }
 
             switch (operatorEntry.value()) {
@@ -221,8 +210,8 @@ function Calculator() {
                     break;
             }
             currentTotal = precision(currentTotal);
-            mDisplay.updateDisplay(currentTotal);
-        } else if (operatorEntry) {
+            //mDisplay.updateDisplay(currentTotal);
+        } else if (operatorEntry) {//operator but no number - sci operation
             switch (operatorEntry.value()) {
                 case "sin":
                     if (!mIsRadians) currentTotal *= Math.PI/180;
@@ -261,41 +250,42 @@ function Calculator() {
                     break;
             }
             currentTotal = precision(currentTotal);
-            mDisplay.updateDisplay(currentTotal);
+            //mDisplay.updateDisplay(currentTotal);
         }
+
         return currentTotal;
     }
     /**
-     * Total the numbers of '=' in the queue. More than one
+     * Finds the indexes of all equal sign entries in the queue
      * @param queue The current queue of {@link Entry} objects
      * @returns {Array} An array of the indices where '=' appears
      */
     function equalsCount(queue){
         var equals = [];
-        for (var i = 0; i < queue.length; i++) {
-            var entry = queue[i];
+        queue.forEach(function (entry,index) {
             if (entry.type() === typeEnum.equalSign) {
-                equals.push(i);
+                equals.push(index);
             }
-        }
+        });
         return equals;
     }
 
     function printQueue(queue) {
         var message = "Queue :";
-        for (var i = 0; i < queue.length; i++) {
-            message += queue[i].value() + " ";
-        }
+        queue.forEach(function (entry) {
+            message += entry.value() + " ";
+        });
+
         console.log(message);
     }
 
     /**
      * Order of operators calculation. Finds the operators and performs the operations
      * @param queue The queue of {@link Entry} objects
-     * @returns {number} The total calculated
+     * @returns {number|null} The total calculated or null if no calculation happened
      */
     function orderOfOps(queue) {
-        var operations = queue.slice();
+        var operations = queue.slice();//local copy of queue
         var total = 0;
         var operatorEntry = null;
         var numberEntry = null;
@@ -304,32 +294,32 @@ function Calculator() {
         while (operations.length > 0) {
             var highest = findHighestOperator(operations);
             if (highest === null) {
-                //Handle extra = in multiple = entry
-                //var equal = operations[operations.length - 1];
+                //No operator found
                 var equalsIndices = equalsCount(operations);
-                if (equalsIndices.length > 0) {
-                    for (var i = 0; i < operations.length; i++) {
-                        var entry = operations[i];
-                        if (entry && entry.type() === typeEnum.equalSign && numberEntry && numberEntry.type() !== typeEnum.equalSign) {
-                            operations.splice(i,1,operatorEntry,numberEntry);
-                            i = -1;
-                        }
-                    }
+                if (equalsIndices.length ===  0) break;//Order of ops done
 
-                    highest = findHighestOperator(operations);
-                    if (highest === null) break;
-                } else {
-                    break;
+                //Handle extra = in multiple = entry
+                for (var i = 0; i < operations.length; i++) {
+                    var entry = operations[i];
+                    if (entry && entry.type() === typeEnum.equalSign && numberEntry && numberEntry.type() !== typeEnum.equalSign) {
+                        //replace = with last operation
+                        operations.splice(i,1,operatorEntry,numberEntry);
+                        i = -1;
+                    }
                 }
+
+                //new operator may be in queue -> find highest operator again
+                highest = findHighestOperator(operations);
+                if (highest === null) break;
             }
 
-            //Need an operator and number to perform operation
+            //Need an operator and number to perform operation -> get all potential entries
             var left = operations[highest.index-1];
             operatorEntry = operations[highest.index];
             numberEntry = operations[highest.index+1];
             var equals = operations[highest.index+2];
 
-            //If an initial/left value exists - use it and splice it out - else use operator and number
+            //If an initial/left value exists -> use it and splice it out -> else use operator and number
             var current = 0;
             var startSplice = highest.index;
             var spliceCount = 1;
@@ -338,25 +328,25 @@ function Calculator() {
                 startSplice = highest.index-1;
                 spliceCount++;
             }
-
+            //If right operand exists and is right type -> add to splice
             if (numberEntry && (numberEntry.type() === typeEnum.number || numberEntry.type() === typeEnum.equalSign)) {
                 spliceCount++;
             }
-
+            //If element after right operand exists and is = -> add to splice
             if (equals && equals.type() === typeEnum.equalSign) {
                 spliceCount++;
             }
-            printQueue(operations);
+
+            //printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
-            if (operatorEntry && checkOperation(operatorEntry,numberEntry)) {
-                //mDisplay.updateDisplay(total);
-                operations.splice(startSplice, spliceCount, new Entry(total));
-                printQueue(operations);
-            }
+            // if (operatorEntry && checkOperation(operatorEntry,numberEntry)) {
+            operations.splice(startSplice, spliceCount, new Entry(total));
+            //printQueue(operations);
+            // }
         }
-        console.log("calculation done");
-        //mDisplay.updateDisplay(total);
-        return total;
+
+        //console.log("calculation done: " + total);
+        return total !==0 ? total : null;
     }
 
     /**
@@ -420,7 +410,7 @@ function Calculator() {
             var precedence = 1;
 
             //Only find operators - times and divide have higher precedence - use number that is > possible index
-            if (entry.value() ===  "÷" || entry.value() ===  "×") {
+            if (operator.value() ===  "÷" || operator.value() ===  "×") {
                 precedence = queue.length * 2;
             }
 
@@ -429,7 +419,6 @@ function Calculator() {
             if (val > highest.value) {
                 highest.index = opIndex;
                 highest.value = val;
-                //console.log("Entry:" + entry.type() + " - " + entry.value());
             }
         }
         //console.log("returning...",highest);
