@@ -238,7 +238,7 @@ function Calculator() {
                 case "1/x":
                     if (currentTotal == 0){
                         //mDisplay.updateDisplay("Error");
-                        return kError;
+                        return kError;//no calculation done
                     }
                     currentTotal = 1 / currentTotal;
                     break;
