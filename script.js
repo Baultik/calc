@@ -92,9 +92,14 @@ function Calculator() {
     var mIsRadians = true;
     var mRadDegButton = $("#radDeg");
     var kError = "Error";
-
+    /**
+     * Get the current total
+     * @returns {number} The calculated total
+     */
     this.total = function() { return mTotal };
-
+    /**
+     * Switch Radian and Degrees
+     */
     this.switchRadDeg = function () {
         mIsRadians = !mIsRadians;
         if (mIsRadians) {
@@ -152,7 +157,11 @@ function Calculator() {
             mTotal = parseFloat(entry.value());
         }
     }
-
+    /**
+     * Attempt to correct precision
+     * @param number A numbered
+     * @returns {Number} A number with corrected precision
+     */
     function precision(number) {
         var result = number;
         var numStr = number.toString();
@@ -170,13 +179,12 @@ function Calculator() {
 
         return parseFloat(result);
     }
-
     /**
      * Calculates an operation
      * @param currentTotal The total to add to or the left operand
      * @param operatorIndex The index of the operator in the queue
      * @param queue The queue with the operator and right operand
-     * @returns {number} The number calculated
+     * @returns {number|string} The number calculated or error string
      */
     function calculate(currentTotal,operatorIndex,queue) {
         var operatorEntry = queue[operatorIndex];
@@ -256,21 +264,11 @@ function Calculator() {
 
         return currentTotal;
     }
-    /**
-     * Finds the indexes of all equal sign entries in the queue
-     * @param queue The current queue of {@link Entry} objects
-     * @returns {Array} An array of the indices where '=' appears
-     */
-    function equalsCount(queue){
-        var equals = [];
-        queue.forEach(function (entry,index) {
-            if (entry.type() === typeEnum.equalSign) {
-                equals.push(index);
-            }
-        });
-        return equals;
-    }
 
+    /**
+     * Prints a queue of {@link Entry} objects
+     * @param queue The queue of {@link Entry} objects
+     */
     function printQueue(queue) {
         var message = "Queue :";
         queue.forEach(function (entry) {
@@ -279,7 +277,6 @@ function Calculator() {
 
         console.log(message);
     }
-
     /**
      * Order of operators calculation. Finds the operators and performs the operations
      * @param queue The queue of {@link Entry} objects
@@ -296,7 +293,14 @@ function Calculator() {
             var highest = findHighestOperator(operations);
             if (highest === null) {
                 //No operator found
-                var equalsIndices = equalsCount(operations);
+                //Finds the indexes of all equal sign entries in the queue
+                var equalsIndices = [];
+                operations.forEach(function (findEqualsEntry,findEqualsIndex) {
+                    if (findEqualsEntry.type() === typeEnum.equalSign) {
+                        equalsIndices.push(findEqualsIndex);
+                    }
+                });
+
                 if (equalsIndices.length ===  0) break;//Order of ops done
 
                 //Handle extra = in multiple = entry
@@ -341,10 +345,9 @@ function Calculator() {
             //printQueue(operations);
             total = calculate(parseFloat(current),highest.index,operations);
             if (total === kError) break;
-            // if (operatorEntry && checkOperation(operatorEntry,numberEntry)) {
+
             operations.splice(startSplice, spliceCount, new Entry(total));
             //printQueue(operations);
-            // }
         }
 
         //console.log("calculation done: " + total);
@@ -382,7 +385,7 @@ function Calculator() {
     /**
      * Finds the highest operator based on precedence and position
      * @param queue The current queue {@link Entry} objects
-     * @returns {*}
+     * @returns {Array}
      */
     function findHighestOperator(queue) {
         //Locate all operators or sci - store operator indexes
@@ -438,14 +441,14 @@ function Entry(value) {
 
     /**
      * Value accessor function
-     * @returns {*} The value
+     * @returns {string} The value
      */
     this.value = function () {
         return mValue;
     };
     /**
      * Type accessor function
-     * @returns {*} The type
+     * @returns {string} The type
      */
     this.type = function () {
         if (mType === null) {
