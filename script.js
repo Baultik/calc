@@ -7,8 +7,8 @@ var typeEnum = {
     operator: "operator",
     equalSign: "equalSign",
     clear: "clear",
-    special:"special",
-    sci:"sci"
+    special: "special",
+    sci: "sci"
 };
 
 $(document).ready(function () {
@@ -22,7 +22,6 @@ $(document).ready(function () {
     var mainGrid = $("#grid-main");
     var sciGrid = $("#grid-sci");
 
-    //var window = $(window);
     if (doc.width() > doc.height()) {
         //scientific
         calcBody.addClass("calculator-body-sci");
@@ -96,7 +95,9 @@ function Calculator() {
      * Get the current total
      * @returns {number} The calculated total
      */
-    this.total = function() { return mTotal };
+    this.total = function () {
+        return mTotal
+    };
     /**
      * Switch Radian and Degrees
      */
@@ -119,7 +120,7 @@ function Calculator() {
         if (lastEntry && lastEntry.add(input)) {
             //entry exists and is number -> add to it - or is operator -> replace it
             //update mDisplay with current value - ie 1.2
-            if (lastEntry.type() === typeEnum.number ) mDisplay.updateDisplay(lastEntry.value());
+            if (lastEntry.type() === typeEnum.number) mDisplay.updateDisplay(lastEntry.value());
             setInitial(lastEntry);
             mDisplay.updateCalculation(mEntryQueue);
             return;
@@ -157,6 +158,7 @@ function Calculator() {
             mTotal = parseFloat(entry.value());
         }
     }
+
     /**
      * Attempt to correct precision
      * @param number A numbered
@@ -179,6 +181,7 @@ function Calculator() {
 
         return parseFloat(result);
     }
+
     /**
      * Calculates an operation
      * @param currentTotal The total to add to or the left operand
@@ -186,9 +189,9 @@ function Calculator() {
      * @param queue The queue with the operator and right operand
      * @returns {number|string} The number calculated or error string
      */
-    function calculate(currentTotal,operatorIndex,queue) {
+    function calculate(currentTotal, operatorIndex, queue) {
         var operatorEntry = queue[operatorIndex];
-        var numberEntry = queue[operatorIndex+1];
+        var numberEntry = queue[operatorIndex + 1];
 
         if (operatorEntry && operatorEntry.type() !== typeEnum.sci && numberEntry) {
             var parsedValue = parseFloat(numberEntry.value());
@@ -199,8 +202,7 @@ function Calculator() {
 
             switch (operatorEntry.value()) {
                 case "÷":
-                    if (parsedValue == 0){
-                        //mDisplay.updateDisplay("Error");
+                    if (parsedValue == 0) {
                         return kError;//no calculation done
                     }
                     currentTotal /= parsedValue;
@@ -215,23 +217,22 @@ function Calculator() {
                     currentTotal -= parsedValue;
                     break;
                 case "xy":
-                    currentTotal = Math.pow(currentTotal,parsedValue);
+                    currentTotal = Math.pow(currentTotal, parsedValue);
                     break;
             }
             currentTotal = precision(currentTotal);
-            //mDisplay.updateDisplay(currentTotal);
         } else if (operatorEntry) {//operator but no number - sci operation
             switch (operatorEntry.value()) {
                 case "sin":
-                    if (!mIsRadians) currentTotal *= Math.PI/180;
+                    if (!mIsRadians) currentTotal *= Math.PI / 180;
                     currentTotal = Math.sin(currentTotal);
                     break;
                 case "cos":
-                    if (!mIsRadians) currentTotal *= Math.PI/180;
+                    if (!mIsRadians) currentTotal *= Math.PI / 180;
                     currentTotal = Math.cos(currentTotal);
                     break;
                 case "tan":
-                    if (!mIsRadians) currentTotal *= Math.PI/180;
+                    if (!mIsRadians) currentTotal *= Math.PI / 180;
                     currentTotal = Math.tan(currentTotal);
                     break;
                 case "√":
@@ -244,8 +245,7 @@ function Calculator() {
                     currentTotal = Math.log(currentTotal) / Math.LN10
                     break;
                 case "1/x":
-                    if (currentTotal == 0){
-                        //mDisplay.updateDisplay("Error");
+                    if (currentTotal == 0) {
                         return kError;//no calculation done
                     }
                     currentTotal = 1 / currentTotal;
@@ -259,7 +259,6 @@ function Calculator() {
                     break;
             }
             currentTotal = precision(currentTotal);
-            //mDisplay.updateDisplay(currentTotal);
         }
 
         return currentTotal;
@@ -277,6 +276,7 @@ function Calculator() {
 
         console.log(message);
     }
+
     /**
      * Order of operators calculation. Finds the operators and performs the operations
      * @param queue The queue of {@link Entry} objects
@@ -295,20 +295,20 @@ function Calculator() {
                 //No operator found
                 //Finds the indexes of all equal sign entries in the queue
                 var equalsIndices = [];
-                operations.forEach(function (findEqualsEntry,findEqualsIndex) {
+                operations.forEach(function (findEqualsEntry, findEqualsIndex) {
                     if (findEqualsEntry.type() === typeEnum.equalSign) {
                         equalsIndices.push(findEqualsIndex);
                     }
                 });
 
-                if (equalsIndices.length ===  0) break;//Order of ops done
+                if (equalsIndices.length === 0) break;//Order of ops done
 
                 //Handle extra = in multiple = entry
                 for (var i = 0; i < operations.length; i++) {
                     var entry = operations[i];
                     if (entry && entry.type() === typeEnum.equalSign && numberEntry && numberEntry.type() !== typeEnum.equalSign) {
                         //replace = with last operation
-                        operations.splice(i,1,operatorEntry,numberEntry);
+                        operations.splice(i, 1, operatorEntry, numberEntry);
                         i = -1;
                     }
                 }
@@ -319,10 +319,10 @@ function Calculator() {
             }
 
             //Need an operator and number to perform operation -> get all potential entries
-            var left = operations[highest.index-1];
+            var left = operations[highest.index - 1];
             operatorEntry = operations[highest.index];
-            numberEntry = operations[highest.index+1];
-            var equals = operations[highest.index+2];
+            numberEntry = operations[highest.index + 1];
+            var equals = operations[highest.index + 2];
 
             //If an initial/left value exists -> use it and splice it out -> else use operator and number
             var current = 0;
@@ -330,7 +330,7 @@ function Calculator() {
             var spliceCount = 1;
             if (left && left.type() === typeEnum.number) {
                 current = left.value();
-                startSplice = highest.index-1;
+                startSplice = highest.index - 1;
                 spliceCount++;
             }
             //If right operand exists and is right type -> add to splice
@@ -343,7 +343,7 @@ function Calculator() {
             }
 
             //printQueue(operations);
-            total = calculate(parseFloat(current),highest.index,operations);
+            total = calculate(parseFloat(current), highest.index, operations);
             if (total === kError) break;
 
             operations.splice(startSplice, spliceCount, new Entry(total));
@@ -351,7 +351,7 @@ function Calculator() {
         }
 
         //console.log("calculation done: " + total);
-        return total !==0 ? total : null;
+        return total !== 0 ? total : null;
     }
 
     /**
@@ -361,7 +361,7 @@ function Calculator() {
      * @param numberEntry Right operand in operation
      * @returns {boolean} Whether an operation can be performed or not
      */
-    function checkOperation(operatorEntry,numberEntry) {
+    function checkOperation(operatorEntry, numberEntry) {
         if (numberEntry) {
             return true;
         }
@@ -395,7 +395,7 @@ function Calculator() {
             if (entry && (entry.type() === typeEnum.operator || entry.type() === typeEnum.sci)) {
                 //If operators exist before a sci operator evaluate those first
                 if (entry.type() === typeEnum.sci && operators.length > 0) {
-                    return findHighestOperator(queue.slice(0,i));
+                    return findHighestOperator(queue.slice(0, i));
                 }
                 operators.push(i);
             }
@@ -408,19 +408,19 @@ function Calculator() {
             //Get operator and right operand
             var opIndex = operators[j];
             var operator = queue[opIndex];
-            var numberEntry = queue[opIndex+1];
+            var numberEntry = queue[opIndex + 1];
             //Check operation
-            if (!checkOperation(operator,numberEntry)) continue;
+            if (!checkOperation(operator, numberEntry)) continue;
 
             var precedence = 1;
 
             //Only find operators - times and divide have higher precedence - use number that is > possible index
-            if (operator.value() ===  "÷" || operator.value() ===  "×") {
+            if (operator.value() === "÷" || operator.value() === "×") {
                 precedence = queue.length * 2;
             }
 
             var val = (queue.length - opIndex) * precedence;//Earlier indexes have higher precedence
-            if (highest === null)highest = {index:0,value:0};
+            if (highest === null) highest = {index: 0, value: 0};
             if (val > highest.value) {
                 highest.index = opIndex;
                 highest.value = val;
@@ -468,7 +468,6 @@ function Entry(value) {
         switch (this.type()) {
             case typeEnum.number:
                 if (mValue.includes(".") && value === ".") {
-                    //mValue = mValue.slice(0, mValue.length - 1);
                     return true;
                 }
                 mValue += value;
