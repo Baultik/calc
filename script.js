@@ -10,6 +10,7 @@ var typeEnum = {
     special: "special",
     sci: "sci"
 };
+var timer = null;
 
 $(document).ready(function () {
     calc = new Calculator();
@@ -18,18 +19,20 @@ $(document).ready(function () {
     doc.on("keypress", handleKeyPress);
     doc.on("keydown", handleSpecialKeys);
 
-    var calcBody = $(".calculator-body");
-    var mainGrid = $("#grid-main");
-    var sciGrid = $("#grid-sci");
-
-    if (doc.width() > doc.height()) {
-        //scientific
-        calcBody.addClass("calculator-body-sci");
-        mainGrid.addClass("grid-right");
-    } else {
-        sciGrid.hide();
-    }
+    $(window).resize(function () {
+        onResize(200,calc.updatePosition);
+    });
+    calc.updatePosition();
 });
+
+function onResize(time, callback) {
+    if (timer != null) {
+        clearTimeout(timer);
+    }
+
+    timer = setTimeout(callback,time);
+}
+
 /**
  * Button click handler
  * @param event The click event
@@ -91,6 +94,13 @@ function Calculator() {
     var mIsRadians = true;
     var mRadDegButton = $("#radDeg");
     var kError = "Error";
+    var calcBody = $(".calculator-body");
+    var mainGrid = $("#grid-main");
+    var sciGrid = $("#grid-sci");
+    var doc = $(document);
+    var width = 250;
+    var sciWidth = 400;
+
     /**
      * Get the current total
      * @returns {number} The calculated total
@@ -429,7 +439,29 @@ function Calculator() {
         //console.log("returning...",highest);
         return highest;
     }
+
+    this.updatePosition = function() {
+        if (doc.width() >= sciWidth) {//doc.width() > doc.height()
+            //scientific
+            ///calcBody.width(sciWidth);
+            calcBody.addClass("calculator-body-sci");
+            mainGrid.addClass("grid-right");
+            sciGrid.show();
+        } else {
+            //calcBody.width(width);
+            calcBody.removeClass("calculator-body-sci");
+            mainGrid.removeClass("grid-right");
+            sciGrid.hide();
+        }
+
+        var left = (doc.width() - calcBody.outerWidth()) / 2;
+        calcBody.css({
+            "left":left
+        });
+    }
 }
+
+
 /**
  * Represents a user input as an object
  * @param value The input from the user

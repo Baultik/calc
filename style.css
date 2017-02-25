@@ -1,5 +1,5 @@
 body {
-    background-color: #a7a7a7;
+    background-color: #484848;
 }
 
 div {
@@ -11,7 +11,14 @@ div {
     width: 250px;
     background-color: #484848;
     padding: 10px;
-    margin: auto;
+    position:absolute;
+    top:0;
+    left:0;
+    border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    border: 5px outset #2f2f2f;
+    box-sizing: border-box;
 }
 
 .calculator-body-sci {
@@ -45,14 +52,14 @@ div {
     width: 33%;
 }
 
-.grid-right {
-    float: right;
-    width: 66%;
-}
-
 .button-container {
     padding: 2px;
     float: left;
+}
+
+.grid-right {
+    float: right;
+    width: 66%;
 }
 
 .btn {
