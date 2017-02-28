@@ -3,82 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <title>Calculator</title>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
-    <script
-            src="https://code.jquery.com/jquery-2.2.4.min.js"
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
             integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
             crossorigin="anonymous"></script>
-    <script src="http://Learning-Fuze.github.io/calculator/calculator.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
 <div class="calculator-body">
     <div class="grid">
-        <div id="display"></div>
-        <div class="row">
-            <div class="button-container col-xs-6">
-                <button class="btn " type="button">C</button>
+        <div id="calculation"></div>
+        <div id="display">0</div>
+        <div id="grid-sci" class="button-container">
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">sin</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">CE</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">ln</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">&divide;</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">cos</button>
             </div>
-        </div>
-        <div class="row">
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">7</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">log</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn "  type="button">8</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">tan</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">9</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button"><sup>1</sup>/x</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">&times;</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">&radic;</button>
             </div>
-        </div>
-        <div class="row">
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">4</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">x<sup>y</sup></button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">5</button>
+            <div class="button-container btn-sci">
+                <button id="radDeg" class="btn btn-operator" type="button">Rad</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">6</button>
-            </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">-</button>
+            <div class="button-container btn-sci">
+                <button class="btn btn-operator" type="button">!</button>
             </div>
         </div>
-        <div class="row">
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">1</button>
+        <div id="grid-main" class="button-container">
+            <div class="button-container btn-wide">
+                <button class="btn btn-danger" type="button">C</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">2</button>
+            <div class="button-container btn-normal">
+                <button class="btn btn-operator" type="button">&divide;</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">3</button>
+            <div class="button-container btn-normal">
+                <button class="btn btn-operator" type="button">&times;</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">+</button>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">7</button>
             </div>
-        </div>
-        <div class="row">
-            <div class="button-container col-xs-6">
-                <button class="btn " type="button">0</button>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">8</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn " type="button">.</button>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">9</button>
             </div>
-            <div class="button-container col-xs-3">
-                <button class="btn btn-primary " type="button">=</button>
+            <div class="button-container btn-normal">
+                <button class="btn btn-operator" type="button">-</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">4</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">5</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">6</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-operator" type="button">+</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">1</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">2</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">3</button>
+            </div>
+            <div class="button-container btn-normal btn-tall">
+                <button class="btn btn-primary" type="button">=</button>
+            </div>
+            <div class="button-container btn-wide">
+                <button class="btn btn-default" type="button">0</button>
+            </div>
+            <div class="button-container btn-normal">
+                <button class="btn btn-default" type="button">.</button>
             </div>
         </div>
     </div>
