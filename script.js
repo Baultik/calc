@@ -36,9 +36,8 @@
 
     /**
      * Button click handler
-     * @param event The click event
      */
-    function handleClick(event) {
+    function handleClick() {
         var button = $(this);
         button.blur(); //remove focus
 
@@ -94,12 +93,12 @@
         var mIsRadians = true;
         var mRadDegButton = $("#radDeg");
         var kError = "Error";
-        var calcBody = $(".calculator-body");
-        var mainGrid = $("#grid-main");
-        var sciGrid = $("#grid-sci");
-        var doc = $(document);
-        var width = 250;
-        var sciWidth = 400;
+        var mCalcBody = $(".calculator-body");
+        var mMainGrid = $("#grid-main");
+        var mSciGrid = $("#grid-sci");
+        var mDoc = $(document);
+        var mWidth = 250;
+        var mSciWidth = 400;
 
         /**
          * Get the current total
@@ -443,19 +442,19 @@
          * Update the position of the calculator and change to normal or scientific based on dimensions
          */
         this.updatePosition = function () {
-            if (doc.width() >= sciWidth) {
+            if (mDoc.width() >= mSciWidth) {
                 //scientific
-                calcBody.addClass("calculator-body-sci");
-                mainGrid.addClass("grid-right");
-                sciGrid.show();
+                mCalcBody.addClass("calculator-body-sci");
+                mMainGrid.addClass("grid-right");
+                mSciGrid.show();
             } else {
-                calcBody.removeClass("calculator-body-sci");
-                mainGrid.removeClass("grid-right");
-                sciGrid.hide();
+                mCalcBody.removeClass("calculator-body-sci");
+                mMainGrid.removeClass("grid-right");
+                mSciGrid.hide();
             }
 
-            var left = (doc.width() - calcBody.outerWidth()) / 2;
-            calcBody.css({
+            var left = (mDoc.width() - mCalcBody.outerWidth()) / 2;
+            mCalcBody.css({
                 "left": left
             });
         }
@@ -559,14 +558,14 @@
      * @constructor
      */
     function Display() {
-        var display = $("#display");
-        var calculation = $("#calculation");
+        var mDisplay = $("#display");
+        var mCalculation = $("#calculation");
         /**
          * Update the main display with a value
          * @param toDisplay The value to display
          */
         this.updateDisplay = function (toDisplay) {
-            display.html(toDisplay);
+            mDisplay.html(toDisplay);
         };
         /**
          * Update the calculation read out from the queue
@@ -577,13 +576,13 @@
             for (var i in queueToDisplay) {
                 toDisplay += queueToDisplay[i].value();
             }
-            calculation.html(toDisplay);
+            mCalculation.html(toDisplay);
         };
         /**
          * Clear the calculation read out
          */
         this.clearCalculation = function () {
-            calculation.html(" ");
+            mCalculation.html(" ");
         };
     }
 })();
